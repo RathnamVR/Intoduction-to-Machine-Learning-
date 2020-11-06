@@ -1,0 +1,58 @@
+import numpy as np
+import torch
+import torch.nn.functional as F
+from torchvision import datasets, transforms
+from tqdm.notebook import tqdm
+mnist_train = datasets.MNIST(root="./datasets", train=True, transform=transforms.ToTensor(), download=True)
+mnist_test = datasets.MNIST(root="./datasets", train=False, transform=transforms.ToTensor(), download=True)
+train_loader = torch.utils.data.DataLoader(mnist_train, batch_size=100, shuffle=True)
+test_loader = torch.utils.data.DataLoader(mnist_test, batch_size=100, shuffle=False)
+w=[]
+B=[]
+for e in range(5):
+    W = torch.randn(784, 10)/np.sqrt(784)
+    W.requires_grad_()
+    b = torch.zeros(10, requires_grad=True)
+    w.append(W)
+    B.append(b)
+C=torch.randn(5,10)/np.sqrt(5)
+C.requires_grad_()
+b1=torch.zeros(10,requires_grad=True)
+c=[]
+c_eye=torch.eye(10)
+for j in range(5):
+    cc=C[j].repeat(10,1)
+    c.append(cc*c_eye)
+optimizer = torch.optim.SGD([w[0],w[1],w[2],w[3],w[4],B[0],B[1],B[2],B[3],B[4],C,b1], lr=0.1)
+for images, labels in tqdm(train_loader):
+    x = images.view(-1, 28*28)
+    for t in range(4): ##you can increase the no of epochs. 
+        optimizer.zero_grad()
+        z=torch.zeros(100,10)
+        for i in range(5):
+            y=torch.matmul(x, w[i]) + B[i]
+            y_relu = F.relu(y)
+            z+=torch.matmul(y_relu,c[i])
+        z1=z+b1
+        cross_entropy = F.cross_entropy(z1, labels)
+        cross_entropy.backward(retain_graph=True)
+        optimizer.step()
+correct = 0
+total = len(mnist_test)
+with torch.no_grad():
+    for images, labels in tqdm(test_loader):
+        x = images.view(-1, 28*28)
+        zk=torch.zeros(100,10)
+        for i in range(5):
+            y=torch.matmul(x, w[i]) + B[i]
+            y_relu = F.relu(y)
+            zk+=torch.matmul(y_relu,c[i])
+        z1=zk+b1
+        predictions = torch.argmax(z1, dim=1)
+        correct += torch.sum((predictions == labels).float())
+
+print(correct/total)
+##accuracy=0.9098
+##No of trainable parameters-
+##This_model=39310
+##Logistic_regression=7850
