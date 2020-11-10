@@ -52,7 +52,7 @@ with torch.no_grad():
         correct += torch.sum((predictions == labels).float())
 
 print(correct/total)
-##accuracy=0.9098
+##accuracy=0.9195
 ##No of trainable parameters-
 ##This_model=39310
 ##Logistic_regression=7850
