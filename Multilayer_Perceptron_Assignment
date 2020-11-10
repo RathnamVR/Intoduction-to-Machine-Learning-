@@ -14,6 +14,7 @@ for e in range(5):
     W.requires_grad_()
     b = torch.zeros(10, requires_grad=True)
     w.append(W)
+    
     B.append(b)
 C=torch.randn(5,10)/np.sqrt(5)
 C.requires_grad_()
@@ -24,13 +25,13 @@ for j in range(5):
     cc=C[j].repeat(10,1)
     c.append(cc*c_eye)
 optimizer = torch.optim.SGD([w[0],w[1],w[2],w[3],w[4],B[0],B[1],B[2],B[3],B[4],C,b1], lr=0.1)
-for images, labels in tqdm(train_loader):
-    x = images.view(-1, 28*28)
-    for t in range(4): ##you can increase the no of epochs. 
+for t in range(4):
+    for images, labels in tqdm(train_loader):
+        x = images.view(-1, 28*28)
         optimizer.zero_grad()
         z=torch.zeros(100,10)
         for i in range(5):
-            y=torch.matmul(x, w[i]) + B[i]
+            y=torch.matmul(x,w[i]) + B[i]
             y_relu = F.relu(y)
             z+=torch.matmul(y_relu,c[i])
         z1=z+b1
@@ -44,7 +45,7 @@ with torch.no_grad():
         x = images.view(-1, 28*28)
         zk=torch.zeros(100,10)
         for i in range(5):
-            y=torch.matmul(x, w[i]) + B[i]
+            y=torch.matmul(x,w[i]) + B[i]
             y_relu = F.relu(y)
             zk+=torch.matmul(y_relu,c[i])
         z1=zk+b1
@@ -52,7 +53,7 @@ with torch.no_grad():
         correct += torch.sum((predictions == labels).float())
 
 print(correct/total)
-##accuracy=0.9195
+##accuracy=0.9205
 ##No of trainable parameters-
 ##This_model=39310
 ##Logistic_regression=7850
