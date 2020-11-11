@@ -13,7 +13,7 @@ for e in range(5):
     W = torch.randn(784, 10)/np.sqrt(784)
     W.requires_grad_()
     b = torch.zeros(10, requires_grad=True)
-    w.append(W)
+    w.append(W) 
     
     B.append(b)
 C=torch.randn(5,10)/np.sqrt(5)
