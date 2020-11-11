@@ -23,7 +23,7 @@ class MNIST_CNN(nn.Module):
         x=self.conv3(x)
         x=F.relu(x)
         x=self.conv4(x)
-        x=F.relu(x)
+        x=F.relu(x) 
         x=F.max_pool2d(x, kernel_size=2)
         x = x.view(-1, 7*7*64)
         x = self.fc1(x)
